@@ -19,10 +19,4 @@ public class UImanager : MonoBehaviour
         PlayerGUI.SetActive(false);
         DeathScreen.SetActive(true);
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

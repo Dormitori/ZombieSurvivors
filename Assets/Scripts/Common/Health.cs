@@ -7,7 +7,7 @@ public class Health : MonoBehaviour
     public event Action<string, float> HealthChanged;
     public event Action<string> Death;
     
-    private bool _isDead = false;
+    private bool _isDead;
 
     public void ChangeHealth(float delta)
     {

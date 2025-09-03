@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
+using UnityEditor.Rendering;
 using UnityEngine;
 
 public enum ZombieState
 {
     Moving,
-    Attacking
+    Attacking,
+    Dead
 }
 
 public class Zombie : MonoBehaviour
@@ -39,7 +41,16 @@ public class Zombie : MonoBehaviour
 
     private void ZombieDeath(string obj)
     {
-        Destroy(gameObject);
+        speed = 0;
+        _state = ZombieState.Dead;
+        AudioManager.instance.Play("ZombieDeath");
+        StartCoroutine(DestroyAfterAnimation());
+    }
+
+    private IEnumerator DestroyAfterAnimation()
+    {
+        yield return new WaitForSeconds(0.1f);
+        Destroy(this);
     }
 
     private void Update()
@@ -55,9 +66,19 @@ public class Zombie : MonoBehaviour
                 _animator.Play("Attack");
                 EatingPlayer();
                 break;
+            case ZombieState.Dead:
+                _animator.Play("Dying");
+                break;
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    public void Bleed(Vector3 point, Quaternion rotation)
+    {
+        _bloodParticles.transform.position = point;
+        _bloodParticles.transform.rotation = rotation;
+        _bloodParticles.Play();
     }
 
     private void EatingPlayer()
@@ -76,20 +97,6 @@ public class Zombie : MonoBehaviour
         transform.up = _player.transform.position - transform.position;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            _state = ZombieState.Attacking;
-        } else if (collision.gameObject.CompareTag("Bullet"))
-        {
-            _bloodParticles.transform.position = collision.transform.position;
-            _bloodParticles.transform.rotation = collision.transform.rotation;
-            _bloodParticles.Play();
-            StartCoroutine(Stun());
-        }
-    }
-
     private IEnumerator Stun()
     {
         _currentSpeed = stunnedSpeed;
@@ -97,12 +104,22 @@ public class Zombie : MonoBehaviour
         _currentSpeed = speed;
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player") && _state != ZombieState.Dead)
+        {
+            _state = ZombieState.Attacking;
+        } else if (collision.gameObject.CompareTag("Bullet"))
+        {
+            StartCoroutine(Stun());
+        }
+    }
+
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.gameObject.CompareTag("Player"))
+        if (collision.gameObject.CompareTag("Player") && _state != ZombieState.Dead)
         {
             _state = ZombieState.Moving;
         }
     }
-
 }
