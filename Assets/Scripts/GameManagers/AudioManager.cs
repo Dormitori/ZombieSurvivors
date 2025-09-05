@@ -47,6 +47,7 @@ public class AudioManager : MonoBehaviour
         }
         
         instance = this;
+        instance.Play("MainTrack");
     }
 
     public void Play(string soundName)
