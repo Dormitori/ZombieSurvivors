@@ -30,4 +30,5 @@
 ## Видео и скриншоты
 <img src="Media/Screen1.png" alt="Screen 1" width="500"/>
 <img src="Media/Screen2.png" alt="Screen 2" width="500"/>
+
 [![Demo Video](https://img.youtube.com/vi/mewRn8s2pcM/0.jpg)](https://youtu.be/mewRn8s2pcM)
